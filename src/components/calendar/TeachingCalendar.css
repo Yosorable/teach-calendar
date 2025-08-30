@@ -1,0 +1,190 @@
+/* ---------- 主题变量 ---------- */
+.tc-wrap {
+  /*  */
+  /* --tc-border: #e5e7eb;
+  --tc-header-bg: #f8fafc;
+  --tc-month-bg: #f1f5f9;
+  --tc-weekday-bg: #ffffff;
+  --tc-weekend-bg: #f9fafb;
+  --tc-holiday-bg: #ffeaea;
+  --tc-makeup-bg: #eaf6ff;
+  --tc-outside-fg: #cbd5e1;
+  --tc-text: #0f172a;
+  --tc-today-ring: #10b981;  */
+
+  --tc-border: #e5e7eb;
+  --tc-header-bg: #fff6fa;
+  --tc-month-bg: #fff6fa;
+  --tc-weekday-bg: rgba(255, 255, 255, 0.8);
+  --tc-weekend-bg: rgba(249, 250, 251, 0.9);
+  --tc-holiday-bg: rgba(255, 234, 234, 1);
+  --tc-makeup-bg: rgba(234, 246, 255, 1);
+  --tc-outside-fg: rgba(203, 213, 225, 0.95);
+  --tc-text: rgba(15, 23, 42, 0.8);
+  --tc-today-ring: #10b981;
+
+  /* 左两列宽度变量，便于计算 sticky 偏移 */
+  --col-month-w: 100px;
+  --col-week-w: 55px;
+
+  color: var(--tc-text);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial;
+}
+
+/* 帧负责圆角与裁切；scroller 负责滚动（sticky 以它为参照） */
+.tc-frame {
+  border: 1px solid var(--tc-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.tc-scroller {
+  overflow: auto;
+  /* 建议限制高度以体现吸顶/定位效果：按需打开 */
+  /* max-height: 70vh; */
+  max-width: 100vw;
+}
+
+/* table 不要 overflow；使用 separate 避免 sticky 异常 */
+.tc-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 600px;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.tc-th,
+.tc-td {
+  border-right: 1px solid var(--tc-border);
+  border-bottom: 1px solid var(--tc-border);
+}
+
+.tc-th {
+  background: var(--tc-header-bg);
+  font-weight: 600;
+  text-align: center;
+  padding: 10px 8px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.tc-col-month {
+  width: var(--col-month-w);
+}
+.tc-col-week {
+  width: var(--col-week-w);
+}
+
+/* 左侧两列：粘性（tbody 行头） */
+tbody .tc-sticky {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--tc-month-bg);
+  will-change: left;
+}
+tbody .tc-sticky-2 {
+  position: sticky;
+  left: calc(var(--col-month-w) + 16px);
+  z-index: 1;
+  background: var(--tc-month-bg);
+  will-change: left;
+}
+
+/* 表头吸顶 */
+.tc-sticky-top {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--tc-header-bg);
+  will-change: top;
+}
+
+/* 表头左两列既要 top 也要 left；并提升 z-index */
+thead .tc-sticky {
+  position: sticky;
+  left: 0;
+  top: 0;
+  background: var(--tc-header-bg);
+  z-index: 5;
+}
+thead .tc-sticky-2 {
+  position: sticky;
+  left: calc(var(--col-month-w) + 16px);
+  top: 0;
+  background: var(--tc-header-bg);
+  z-index: 4;
+}
+
+/* 行头样式 */
+.tc-rowhead {
+  font-weight: 600;
+}
+
+.tc-td,
+.tc-cell {
+  height: 64px;
+  padding: 6px 8px;
+  vertical-align: top;
+  font-size: 13px;
+  position: relative;
+}
+
+.tc-cell .tc-date {
+  font-weight: 600;
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+/* 背景层级：调休 > 节假日 > 周末 > 工作日 */
+.tc-weekday {
+  background: var(--tc-weekday-bg);
+}
+.tc-weekend {
+  background: var(--tc-weekend-bg);
+}
+.tc-holiday {
+  background: var(--tc-holiday-bg);
+}
+.tc-makeup {
+  background: var(--tc-makeup-bg);
+}
+
+.tc-outside .tc-date {
+  color: var(--tc-outside-fg);
+}
+
+/* “今天”高亮：内发光 + 边框微凸显，不影响表格布局 */
+.tc-today {
+  box-shadow: inset 0 0 0 2px var(--tc-today-ring);
+  position: relative;
+}
+.tc-today::after {
+  content: "今天";
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--tc-today-ring) 15%, transparent);
+  color: #065f46;
+}
+
+/* 角标（节假日/调休标签） */
+.tc-badge {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #00000014;
+}
+.tc-holiday .tc-badge {
+  background: #ff4d4f22;
+}
+.tc-makeup .tc-badge {
+  background: #1677ff22;
+}
