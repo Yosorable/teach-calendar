@@ -112,8 +112,7 @@ export default function TeacherTimetable(props: TeacherTimetableProps) {
                         </th>
                       )}
                       <th class="tt-rowhead tt-period">
-                        <span class="tt-period-lg">第 {courseNO} 节</span>
-                        <span class="tt-period-sm">{courseNO}</span>
+                        <div class="tt-period-wrapper" data-n={courseNO}></div>
                       </th>
                       <For each={weekdays()}>
                         {(_, d) => {

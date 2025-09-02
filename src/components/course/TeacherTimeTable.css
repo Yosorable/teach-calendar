@@ -51,6 +51,12 @@
 }
 .tt-course {
   font-weight: 600;
+  display: -webkit-box; /* 必须 */
+  -webkit-box-orient: vertical; /* 垂直方向 */
+  -webkit-line-clamp: 2; /* 限制显示的行数，这里是两行 */
+  overflow: hidden; /* 超出部分隐藏 */
+  text-overflow: ellipsis; /* 超出显示省略号 */
+  word-break: break-word; /* 单词过长时换行 */
 }
 .tt-meta {
   font-size: 12px;
@@ -65,11 +71,16 @@
 .tt-period-sm {
   display: none;
 }
-@media (max-width: 500px) {
-  .tt-period-lg {
-    display: none;
-  }
-  .tt-period-sm {
-    display: block;
+
+.tt-period-wrapper {
+  container-type: inline-size;
+}
+.tt-period-wrapper::before {
+  content: "第" attr(data-n) "节";
+}
+
+@container (max-width: 51px) {
+  .tt-period-wrapper::before {
+    content: attr(data-n);
   }
 }

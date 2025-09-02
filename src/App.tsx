@@ -191,6 +191,7 @@ function App() {
       <div
         style={{
           "max-width": "500px",
+          "min-width": "411px",
         }}
       >
         <TeacherTimetable
