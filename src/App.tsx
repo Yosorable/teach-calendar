@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal, onMount } from "solid-js";
+import { createMemo, createSignal, onMount } from "solid-js";
 import {
   TeachingCalendar,
   type SpecialDay,
@@ -8,6 +8,7 @@ import type { HolidayInfo } from "./api/models";
 
 import TeacherTimetable, {
   type CellsMap,
+  type Section,
 } from "./components/course/TeacherTimeTable";
 
 interface AppConfig {
@@ -22,6 +23,7 @@ interface AppConfig {
     color: string;
     sections: string[];
   }[];
+  courseSections: Section[];
   time?: string[];
   centerImage?: string;
   backgroundImage?: string;
@@ -38,8 +40,6 @@ function App() {
   const [scrollToToday, setScrollToToday] = createSignal<(() => void) | null>(
     null
   );
-
-  createEffect;
 
   onMount(() => {
     API.getHolidayInfo().then((res) => {
@@ -130,6 +130,7 @@ function App() {
           course: res,
           backgroundImage: config.backgroundImage,
           centerImage: config.centerImage,
+          couurseSections: config.courseSections,
         };
       } catch (error) {
         console.warn("JSON parse error:", error);
@@ -242,7 +243,28 @@ function App() {
           data={appConfig().course}
           onCellClick={() => {}}
           weekdays={["星期一", "星期二", "星期三", "星期四", "星期五"]}
-          sections={undefined}
+          sections={
+            appConfig().couurseSections ?? [
+              {
+                title: "上午",
+                periods: [
+                  { start: "08:00", end: "08:40" },
+                  { start: "08:50", end: "09:30" },
+                  { start: "09:40", end: "10:20" },
+                  { start: "10:30", end: "11:10" },
+                ],
+              },
+              {
+                title: "下午",
+                periods: [
+                  { start: "13:00", end: "13:40" },
+                  { start: "13:50", end: "14:30" },
+                  { start: "14:40", end: "15:20" },
+                  { start: "15:30", end: "16:10" },
+                ],
+              },
+            ]
+          }
           currentTime={now}
         />
       </div>
