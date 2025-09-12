@@ -10,6 +10,7 @@ import TeacherTimetable, {
   type CellsMap,
   type Section,
 } from "./components/course/TeacherTimeTable";
+import { atobUtf8 } from "./utils/base64";
 
 interface AppConfig {
   calendar: {
@@ -109,7 +110,16 @@ function App() {
 
   const appConfig = createMemo(() => {
     const hash = window.location.hash.split("#")[1];
-    const jsonStr = hash ? decodeURIComponent(hash) : "";
+    const jsonStr = hash
+      ? (() => {
+          const decoded = decodeURIComponent(hash);
+          try {
+            return atobUtf8(decoded);
+          } catch {
+            return decoded;
+          }
+        })()
+      : "";
 
     if (jsonStr !== "") {
       try {
