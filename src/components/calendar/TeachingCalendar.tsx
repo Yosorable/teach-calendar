@@ -1,4 +1,11 @@
-import { type Component, For, Show, createMemo, onMount } from "solid-js";
+import {
+  type Accessor,
+  type Component,
+  For,
+  Show,
+  createMemo,
+  onMount,
+} from "solid-js";
 import "./TeachingCalendar.css";
 
 /** 休息/调休 标记 */
@@ -23,6 +30,8 @@ interface TeachingCalendarProps {
   maxHeight?: string;
 
   hideYear?: boolean;
+
+  currentTime?: Accessor<Date>;
 
   /** 暴露方法给父组件 */
   onReady?: (api: {
@@ -98,9 +107,11 @@ export const TeachingCalendar: Component<TeachingCalendarProps> = (props) => {
   const maxHeight = createMemo(() => props.maxHeight ?? "100vh");
   const hideYear = createMemo(() => props.hideYear ?? false);
 
+  const currentTime = props.currentTime;
+
   const todayKey = createMemo(() => {
     if (props.todayOverride) return props.todayOverride;
-    const now = new Date(); // 本地时区
+    const now = currentTime ? currentTime() : new Date(); // 本地时区
     return ymd(now);
   });
 

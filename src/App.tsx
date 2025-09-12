@@ -1,4 +1,4 @@
-import { createMemo, createSignal, onMount } from "solid-js";
+import { createEffect, createMemo, createSignal, onMount } from "solid-js";
 import {
   TeachingCalendar,
   type SpecialDay,
@@ -18,16 +18,28 @@ interface AppConfig {
   course: {
     name: string;
     className: string;
-    room: string;
+    room?: string;
     color: string;
     sections: string[];
   }[];
+  time?: string[];
   centerImage?: string;
   backgroundImage?: string;
 }
 
+let mock = window.location.hostname === "localhost";
+
 function App() {
   const [specialDays, setSpecialDays] = createSignal<SpecialDay[]>([]);
+  const [now, setNow] = createSignal(
+    mock ? new Date("2025-09-09T20:00:00") : new Date()
+  );
+
+  const [scrollToToday, setScrollToToday] = createSignal<(() => void) | null>(
+    null
+  );
+
+  createEffect;
 
   onMount(() => {
     API.getHolidayInfo().then((res) => {
@@ -61,6 +73,38 @@ function App() {
       });
       setSpecialDays(holidays);
     });
+
+    if (mock) {
+      const interval = setInterval(() => {
+        setNow((prev) => {
+          const res = new Date(prev.getTime() + 1000 * 60 * 60);
+
+          if (res.getDate() !== prev.getDate()) {
+            const fn = scrollToToday();
+            if (fn) fn();
+          }
+
+          return res;
+        });
+        console.log("now:", now());
+      }, 1000);
+
+      return () => clearInterval(interval);
+    } else {
+      const interval = setInterval(() => {
+        setNow((prev) => {
+          const res = new Date();
+          if (res.getDate() !== prev.getDate()) {
+            const fn = scrollToToday();
+            if (fn) fn();
+          }
+
+          return res;
+        });
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
   });
 
   const appConfig = createMemo(() => {
@@ -198,10 +242,8 @@ function App() {
           data={appConfig().course}
           onCellClick={() => {}}
           weekdays={["星期一", "星期二", "星期三", "星期四", "星期五"]}
-          sections={[
-            { title: "上午", periods: 4 },
-            { title: "下午", periods: 4 },
-          ]}
+          sections={undefined}
+          currentTime={now}
         />
       </div>
       {appConfig().centerImage && (
@@ -229,8 +271,11 @@ function App() {
           ]}
           specialDays={specialDays()}
           hideYear
-          onReady={(api) => api.scrollToToday()}
+          onReady={(api) => {
+            setScrollToToday(() => api.scrollToToday);
+          }}
           maxHeight="80vh"
+          currentTime={now}
         />
       </div>
     </div>

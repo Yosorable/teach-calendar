@@ -38,7 +38,7 @@
 .tt-slot {
   height: 64px;
   text-align: left;
-  cursor: pointer;
+  /* cursor: pointer; */
   background: var(--ttt-slot-background);
 }
 .tt-slot.has {
@@ -79,8 +79,52 @@
   content: "第" attr(data-n) "节";
 }
 
+.tt-period-time-range {
+  container-type: inline-size;
+  font-size: 10px;
+  margin-top: 2px;
+  /* color: gray; */
+}
+
+.tt-period-time-range::before {
+  content: attr(data-n);
+}
+
 @container (max-width: 51px) {
   .tt-period-wrapper::before {
     content: attr(data-n);
   }
+  .tt-period-time-range::before {
+    display: none;
+  }
+}
+
+.timeline-container {
+  position: relative; /* 让内部绝对定位生效 */
+}
+
+.timeline-line {
+  position: absolute;
+  display: none;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  background: rgba(229, 127, 143, 0.8);
+  box-shadow: 0 0 3px #e57f8f;
+}
+
+.timeline-line-time-info {
+  font-size: 10px;
+  display: flex;
+  justify-content: center;
+  margin-top: -13px;
+  height: 13px;
+  color: black;
+  background: rgba(251, 247, 248, 0.8);
+  transition: background 0.3s;
+  cursor: default;
+}
+
+.timeline-line-time-info:hover {
+  background: rgba(255, 193, 203, 0.8);
 }
