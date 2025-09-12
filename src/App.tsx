@@ -147,6 +147,10 @@ function App() {
       }
     }
 
+    setTimeout(() => {
+      alert("配置不正确，请检查链接是否完整，此次使用默认配置！");
+    }, 500);
+
     return {
       calendar: {
         start: new Date().toISOString().split("T")[0],
