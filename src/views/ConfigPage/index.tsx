@@ -2,56 +2,60 @@ import { createSignal, For, onMount } from "solid-js";
 import { type AppConfig } from "../../App";
 import { btoaUtf8 } from "../../utils/base64";
 
-const defaultConfig: AppConfig = {
-  calendar: {
-    start: "2025-09-01",
-    end: "2026-02-08",
-  },
-  course: [
-    {
-      name: "数学",
-      className: "六(1)班",
-      sections: ["1-0-1", "2-1-0", "3-0-1", "4-0-0", "4-0-3"],
+function newDefaultConfig(): AppConfig {
+  return {
+    calendar: {
+      start: "2025-09-01",
+      end: "2026-02-08",
     },
-    {
-      name: "数学",
-      className: "六(2)班",
-      sections: ["0-1-2", "1-0-0", "2-0-3", "2-1-2", "3-0-2"],
-    },
-    {
-      name: "校本课程(数)",
-      className: "六(1)班",
-      sections: ["0-1-3"],
-    },
-    {
-      name: "校本课程(数)",
-      className: "六(2)班",
-      sections: ["4-1-1"],
-    },
-  ],
-  courseSections: [
-    {
-      title: "上午",
-      periods: [
-        { start: "08:00", end: "08:40" },
-        { start: "08:50", end: "09:30" },
-        { start: "09:40", end: "10:20" },
-        { start: "10:30", end: "11:10" },
-      ],
-    },
-    {
-      title: "下午",
-      periods: [
-        { start: "13:00", end: "13:40" },
-        { start: "13:50", end: "14:30" },
-        { start: "14:40", end: "15:20" },
-        { start: "15:30", end: "16:10" },
-      ],
-    },
-  ],
-  backgroundImage: "https://w.wallhaven.cc/full/po/wallhaven-po2vg3.jpg",
-  centerImage: undefined,
-};
+    course: [
+      {
+        name: "数学",
+        className: "六(1)班",
+        sections: ["1-0-1", "2-1-0", "3-0-1", "4-0-0", "4-0-3"],
+      },
+      {
+        name: "数学",
+        className: "六(2)班",
+        sections: ["0-1-2", "1-0-0", "2-0-3", "2-1-2", "3-0-2"],
+      },
+      {
+        name: "校本课程(数)",
+        className: "六(1)班",
+        sections: ["0-1-3"],
+      },
+      {
+        name: "校本课程(数)",
+        className: "六(2)班",
+        sections: ["4-1-1"],
+      },
+    ],
+    courseSections: [
+      {
+        title: "上午",
+        periods: [
+          { start: "08:00", end: "08:40" },
+          { start: "08:50", end: "09:30" },
+          { start: "09:40", end: "10:20" },
+          { start: "10:30", end: "11:10" },
+        ],
+      },
+      {
+        title: "下午",
+        periods: [
+          { start: "13:00", end: "13:40" },
+          { start: "13:50", end: "14:30" },
+          { start: "14:40", end: "15:20" },
+          { start: "15:30", end: "16:10" },
+        ],
+      },
+    ],
+    backgroundImage: "https://w.wallhaven.cc/full/po/wallhaven-po2vg3.jpg",
+    centerImage: undefined,
+  };
+}
+
+const defaultConfig: AppConfig = newDefaultConfig();
 
 export default function ConfigPage() {
   const [loaded, setLoaded] = createSignal(false);
@@ -97,18 +101,18 @@ export default function ConfigPage() {
   }
 
   function reset() {
-    setCalendar({ ...defaultConfig.calendar });
-    setCourseSections([...defaultConfig.courseSections]);
-    setCourses([...defaultConfig.course]);
-    setCenterImage(defaultConfig.centerImage);
-    setBackgroundImage(defaultConfig.backgroundImage);
+    const config = newDefaultConfig();
+    setCalendar(config.calendar);
+    setCourseSections(config.courseSections);
+    setCourses(config.course);
+    setCenterImage(config.centerImage);
+    setBackgroundImage(config.backgroundImage);
   }
 
   onMount(() => {
     const stored = localStorage.getItem("teach-calendar-app-config");
     if (stored) {
       try {
-        console.log(2);
         const config = JSON.parse(stored) as AppConfig;
         setCalendar(config.calendar);
         setCourses(config.course);
