@@ -21,7 +21,7 @@ export interface AppConfig {
     name: string;
     className: string;
     room?: string;
-    color: string;
+    color?: string;
     sections: string[];
   }[];
   courseSections: Section[];
@@ -137,6 +137,7 @@ function App() {
             };
           });
         }
+        allocateColor(res);
         return {
           calendar: config.calendar,
           course: res,
@@ -163,7 +164,7 @@ function App() {
     };
   });
 
-  function generateCourseCell() {
+  function allocateColor(cells: CellsMap) {
     const candidateColors = [
       "hsl(  0 65% 86%)", // 柔和红
       "hsl( 30 65% 86%)", // 橙
@@ -178,6 +179,39 @@ function App() {
       "hsl(300 60% 88%)", // 品红
       "hsl(330 65% 88%)", // 粉
     ];
+
+    const mp: Record<string, string> = {};
+    const keysCnt: Record<string, number> = {};
+    let idx = 0;
+
+    for (const key in cells) {
+      const cell = cells[key];
+      const colorKey = cell.course + (cell.className ?? "");
+      keysCnt[colorKey] = (keysCnt[colorKey] || 0) + 1;
+    }
+
+    // 根据key出现的次数排序
+    const sortedKeys = Object.keys(keysCnt).sort(
+      (a, b) => keysCnt[a] - keysCnt[b]
+    );
+
+    for (const key of sortedKeys) {
+      if (!(key in mp)) {
+        const c = idx++ % candidateColors.length;
+        mp[key] = candidateColors[c];
+      }
+    }
+
+    for (const key in cells) {
+      const cell = cells[key];
+      const colorKey = cell.course + (cell.className ?? "");
+      if (colorKey in mp) {
+        cell.color = mp[colorKey];
+      }
+    }
+  }
+
+  function generateCourseCell() {
     const res: CellsMap = {
       "1-0-1": { course: "数学", className: "六(1)班" },
       "2-1-0": { course: "数学", className: "六(1)班" },
@@ -201,36 +235,7 @@ function App() {
         className: "六(2)班",
       },
     };
-
-    const mp: Record<string, string> = {};
-    const keysCnt: Record<string, number> = {};
-    let idx = 0;
-
-    for (const key in res) {
-      const cell = res[key];
-      const colorKey = cell.course + (cell.className ?? "");
-      keysCnt[colorKey] = (keysCnt[colorKey] || 0) + 1;
-    }
-
-    // 根据key出现的次数排序
-    const sortedKeys = Object.keys(keysCnt).sort(
-      (a, b) => keysCnt[a] - keysCnt[b]
-    );
-
-    for (const key of sortedKeys) {
-      if (!(key in mp)) {
-        const c = idx++ % candidateColors.length;
-        mp[key] = candidateColors[c];
-      }
-    }
-
-    for (const key in res) {
-      const cell = res[key];
-      const colorKey = cell.course + (cell.className ?? "");
-      if (colorKey in mp) {
-        cell.color = mp[colorKey];
-      }
-    }
+    allocateColor(res);
 
     return res;
   }
@@ -282,8 +287,19 @@ function App() {
         />
       </div>
       {appConfig().centerImage && (
-        <div>
-          <img src={appConfig().centerImage} alt="Center" />
+        <div
+          style={{
+            "max-width": "300px",
+            "min-width": "70px",
+          }}
+        >
+          <img
+            style={{
+              width: "100%",
+            }}
+            src={appConfig().centerImage}
+            alt="Center"
+          />
         </div>
       )}
       <div
