@@ -98,8 +98,8 @@ export default function ConfigPage() {
 
   function reset() {
     setCalendar({ ...defaultConfig.calendar });
-    setCourses([...defaultConfig.course]);
     setCourseSections([...defaultConfig.courseSections]);
+    setCourses([...defaultConfig.course]);
     setCenterImage(defaultConfig.centerImage);
     setBackgroundImage(defaultConfig.backgroundImage);
   }
