@@ -107,6 +107,7 @@ export default function TeacherTimetable(props: TeacherTimetableProps) {
     // 星期
     if (d === (curr.getDay() + 6) % 7) {
       const hm = `${pad(curr.getHours())}:${pad(curr.getMinutes())}`;
+      const inactive = "linear-gradient(90deg, #9aa3b2, #6b7280)";
       if (hm >= sec.periods[p - 1].start && hm < sec.periods[p - 1].end) {
         timeStampStyle["display"] = "block";
 
@@ -121,7 +122,7 @@ export default function TeacherTimetable(props: TeacherTimetableProps) {
         timeStampStyle["display"] = "block";
         timeStampStyle["top"] = "-3px";
         timeStampStyle["box-shadow"] = "none";
-        timeStampStyle["background"] = "gray";
+        timeStampStyle["background"] = inactive;
       } else if (
         hm >= sec.periods[p - 1].end &&
         ((p < sec.periods.length && hm < sec.periods[p].start) ||
@@ -135,7 +136,7 @@ export default function TeacherTimetable(props: TeacherTimetableProps) {
           timeStampStyle["display"] = "block";
           timeStampStyle["top"] = "calc(100% - 3px)";
           timeStampStyle["box-shadow"] = "none";
-          timeStampStyle["background"] = "gray";
+          timeStampStyle["background"] = inactive;
         }
       } else {
         timeStampStyle["display"] = "none";
@@ -231,9 +232,12 @@ export default function TeacherTimetable(props: TeacherTimetableProps) {
               >
                 {(p) => {
                   let courseNO = p;
-                  let timeRange = `${sec.periods[p - 1].start}~${
+                  const timeRange = `${sec.periods[p - 1].start} ~ ${
                     sec.periods[p - 1].end
                   }`;
+
+                  const st = sec.periods[p - 1].start;
+                  const et = sec.periods[p - 1].end;
 
                   if (si() !== 0) {
                     for (let i = 0; i < si(); i++) {
@@ -256,7 +260,8 @@ export default function TeacherTimetable(props: TeacherTimetableProps) {
                         <div class="tt-period-wrapper" data-n={courseNO}></div>
                         <div
                           class="tt-period-time-range"
-                          data-n={timeRange}
+                          data-st={st}
+                          data-et={et}
                         ></div>
                       </th>
                       <For each={weekdays()}>
@@ -287,6 +292,23 @@ export default function TeacherTimetable(props: TeacherTimetableProps) {
                               }
                             >
                               <div
+                                class={
+                                  si() === 0 && p === 1
+                                    ? "tt-tooltip-top"
+                                    : "tt-tooltip"
+                                }
+                              >
+                                {timeRange}
+                              </div>
+                              <div class="timeline-content">
+                                {cell ? (
+                                  renderCell(cell)
+                                ) : (
+                                  <span class="tt-emptytext">—</span>
+                                )}
+                              </div>
+
+                              <div
                                 style={getTimelineStyle(sec, d(), si(), p)}
                                 class="timeline-line"
                               >
@@ -298,13 +320,6 @@ export default function TeacherTimetable(props: TeacherTimetableProps) {
                                     )}`;
                                   })()}
                                 </div>
-                              </div>
-                              <div class="timeline-content">
-                                {cell ? (
-                                  renderCell(cell)
-                                ) : (
-                                  <span class="tt-emptytext">—</span>
-                                )}
                               </div>
                             </td>
                           );

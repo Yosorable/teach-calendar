@@ -12,7 +12,7 @@ import TeacherTimetable, {
 } from "./components/course/TeacherTimeTable";
 import { atobUtf8 } from "./utils/base64";
 
-interface AppConfig {
+export interface AppConfig {
   calendar: {
     start: string;
     end: string;
@@ -25,17 +25,19 @@ interface AppConfig {
     sections: string[];
   }[];
   courseSections: Section[];
-  time?: string[];
   centerImage?: string;
   backgroundImage?: string;
 }
 
-let mock = window.location.hostname === "localhost";
+let mock =
+  window.location.hostname === "localhost" ||
+  window.location.href.toLowerCase().includes("mock=true") ||
+  window.location.href.toLowerCase().includes("192.168.");
 
 function App() {
   const [specialDays, setSpecialDays] = createSignal<SpecialDay[]>([]);
   const [now, setNow] = createSignal(
-    mock ? new Date("2025-09-09T20:00:00") : new Date()
+    mock ? new Date("2025-09-08T07:50:00") : new Date()
   );
 
   const [scrollToToday, setScrollToToday] = createSignal<(() => void) | null>(
@@ -78,7 +80,7 @@ function App() {
     if (mock) {
       const interval = setInterval(() => {
         setNow((prev) => {
-          const res = new Date(prev.getTime() + 1000 * 60 * 60);
+          const res = new Date(prev.getTime() + 1000 * 60 * 10);
 
           if (res.getDate() !== prev.getDate()) {
             const fn = scrollToToday();
@@ -147,16 +149,15 @@ function App() {
       }
     }
 
-    setTimeout(() => {
-      alert("配置不正确，请检查链接是否完整，此次使用默认配置！");
-    }, 500);
+    if (!mock)
+      setTimeout(() => {
+        alert("配置不正确，请检查链接是否完整，此次使用默认配置！");
+      }, 500);
 
     return {
       calendar: {
-        start: new Date().toISOString().split("T")[0],
-        end: new Date(new Date().setFullYear(new Date().getFullYear() + 1))
-          .toISOString()
-          .split("T")[0],
+        start: "2025-09-01",
+        end: "2026-02-08",
       },
       course: generateCourseCell(),
     };
@@ -178,28 +179,26 @@ function App() {
       "hsl(330 65% 88%)", // 粉
     ];
     const res: CellsMap = {
-      "1-0-0": { course: "数学", className: "六(2)班", room: "A102" },
-      "1-0-1": { course: "数学", className: "六(1)班", room: "A101" },
-      "1-0-2": { course: "数学", className: "六(2)班", room: "A102" },
+      "1-0-1": { course: "数学", className: "六(1)班" },
+      "2-1-0": { course: "数学", className: "六(1)班" },
+      "3-0-1": { course: "数学", className: "六(1)班" },
+      "4-0-0": { course: "数学", className: "六(1)班" },
+      "4-0-3": { course: "数学", className: "六(1)班" },
 
-      "2-0-2": { course: "数学", className: "六(2)班", room: "A102" },
-      "2-1-0": { course: "数学", className: "六(1)班", room: "A101" },
-      "2-1-2": { course: "数学", className: "六(2)班", room: "A102" },
-      "2-1-3": {
+      "0-1-2": { course: "数学", className: "六(2)班" },
+      "1-0-0": { course: "数学", className: "六(2)班" },
+      "2-0-3": { course: "数学", className: "六(2)班" },
+      "2-1-2": { course: "数学", className: "六(2)班" },
+      "3-0-2": { course: "数学", className: "六(2)班" },
+
+      "0-1-3": {
         course: "校本课程(数)",
         className: "六(1)班",
-        room: "A101",
       },
 
-      "3-0-2": { course: "数学", className: "六(2)班", room: "A102" },
-      "3-0-3": { course: "数学", className: "六(1)班", room: "A101" },
-
-      "4-0-0": { course: "数学", className: "六(1)班", room: "A101" },
-      "4-0-3": { course: "数学", className: "六(1)班", room: "A101" },
-      "4-1-0": {
+      "4-1-1": {
         course: "校本课程(数)",
         className: "六(2)班",
-        room: "A102",
       },
     };
 
@@ -242,7 +241,7 @@ function App() {
       style={{
         "background-image": appConfig().backgroundImage
           ? `url(${appConfig().backgroundImage})`
-          : undefined,
+          : "url(https://w.wallhaven.cc/full/po/wallhaven-po2vg3.jpg)",
         "background-size": "cover",
         "background-position": "center",
       }}
