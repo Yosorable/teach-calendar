@@ -1,13 +1,13 @@
-import { createSignal, For } from "solid-js";
+import { createSignal, For, onMount } from "solid-js";
 import { type AppConfig } from "../../App";
 import { btoaUtf8 } from "../../utils/base64";
 
-export default function ConfigPage() {
-  const [calendar, setCalendar] = createSignal<AppConfig["calendar"]>({
+const defaultConfig: AppConfig = {
+  calendar: {
     start: "2025-09-01",
     end: "2026-02-08",
-  });
-  const [courses, setCourses] = createSignal<AppConfig["course"]>([
+  },
+  course: [
     {
       name: "数学",
       className: "六(1)班",
@@ -28,10 +28,8 @@ export default function ConfigPage() {
       className: "六(2)班",
       sections: ["4-1-1"],
     },
-  ]);
-  const [courseSections, setCourseSections] = createSignal<
-    AppConfig["courseSections"]
-  >([
+  ],
+  courseSections: [
     {
       title: "上午",
       periods: [
@@ -50,12 +48,28 @@ export default function ConfigPage() {
         { start: "15:30", end: "16:10" },
       ],
     },
-  ]);
-  const [centerImage, setCenterImage] =
-    createSignal<AppConfig["centerImage"]>(undefined);
+  ],
+  backgroundImage: "https://w.wallhaven.cc/full/po/wallhaven-po2vg3.jpg",
+  centerImage: undefined,
+};
+
+export default function ConfigPage() {
+  const [loaded, setLoaded] = createSignal(false);
+  const [calendar, setCalendar] = createSignal<AppConfig["calendar"]>(
+    defaultConfig.calendar
+  );
+  const [courses, setCourses] = createSignal<AppConfig["course"]>(
+    defaultConfig.course
+  );
+  const [courseSections, setCourseSections] = createSignal<
+    AppConfig["courseSections"]
+  >(defaultConfig.courseSections);
+  const [centerImage, setCenterImage] = createSignal<AppConfig["centerImage"]>(
+    defaultConfig.centerImage
+  );
   const [backgroundImage, setBackgroundImage] = createSignal<
     AppConfig["backgroundImage"]
-  >("https://w.wallhaven.cc/full/po/wallhaven-po2vg3.jpg");
+  >(defaultConfig.backgroundImage);
 
   function generateLink() {
     let centerImg = centerImage();
@@ -82,6 +96,33 @@ export default function ConfigPage() {
     )}#${encoded}`;
   }
 
+  function reset() {
+    setCalendar({ ...defaultConfig.calendar });
+    setCourses([...defaultConfig.course]);
+    setCourseSections([...defaultConfig.courseSections]);
+    setCenterImage(defaultConfig.centerImage);
+    setBackgroundImage(defaultConfig.backgroundImage);
+  }
+
+  onMount(() => {
+    const stored = localStorage.getItem("teach-calendar-app-config");
+    if (stored) {
+      try {
+        console.log(2);
+        const config = JSON.parse(stored) as AppConfig;
+        setCalendar(config.calendar);
+        setCourses(config.course);
+        setCourseSections(config.courseSections);
+        setCenterImage(config.centerImage);
+        setBackgroundImage(config.backgroundImage);
+      } catch (e) {
+        console.error("配置文件解析失败", e);
+      }
+    }
+
+    setLoaded(true);
+  });
+
   const configJsonStr = () => {
     let centerImg = centerImage();
     if (centerImg === "") centerImg = undefined;
@@ -96,7 +137,11 @@ export default function ConfigPage() {
       backgroundImage: backgroundImg,
     };
 
-    return JSON.stringify(config, null, 2);
+    const str = JSON.stringify(config, null, 2);
+
+    if (loaded()) localStorage.setItem("teach-calendar-app-config", str);
+
+    return str;
   };
 
   return (
@@ -107,6 +152,8 @@ export default function ConfigPage() {
           right: "20px",
         }}
       >
+        <button onClick={reset}>恢复默认配置</button>
+
         <a href={generateLink()} target="_blank" rel="noopener noreferrer">
           打开链接
         </a>
